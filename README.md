@@ -3,6 +3,8 @@
 Theory power spectra for **patchy reionization** and their cross-correlation
 with **CMB lensing**, implemented in Julia.
 
+> These spectra were used in [arXiv:2210.10893](https://arxiv.org/abs/2210.10893).
+
 During the epoch of reionization the free-electron field is spatially
 inhomogeneous ("patchy"), which imprints fluctuations in the Thomson optical
 depth along each line of sight. `PatchyTau` models this with an ionized-bubble
