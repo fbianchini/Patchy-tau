@@ -1,0 +1,11 @@
+# Julia
+Manifest.toml
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+/docs/build/
+
+# Generated outputs
+/data/
+*.pdf
+.ipynb_checkpoints/

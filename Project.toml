@@ -1,0 +1,20 @@
+name = "PatchyTau"
+uuid = "7b9c1e54-3a2d-4c8b-9f16-2d5a7e0b4c83"
+authors = ["Federico Bianchini <federico.bianxini@gmail.com>"]
+version = "0.1.0"
+
+# NOTE: the [deps] section below is intentionally left empty. The dependency
+# UUIDs are resolved automatically by running `scripts/setup.jl` (or the
+# `Pkg.add` line in the README), which writes the correct entries here. This
+# avoids shipping stale/incorrect UUIDs for unregistered or locally-installed
+# packages such as MatterPower.
+[deps]
+
+[compat]
+julia = "1.7"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
