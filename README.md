@@ -22,10 +22,6 @@ The physics follows the bubble model of
 cross-spectrum is of the kind discussed in
 [Feng & Holder (2018)](https://arxiv.org/abs/1808.01592).
 
-This package is a refactor of the original
-`cmb_tau_lensing_theory_spectra.ipynb` notebook into reusable, documented
-source files.
-
 ## Installation
 
 The package is not registered; install it locally. From the repository root:
