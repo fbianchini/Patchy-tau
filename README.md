@@ -108,11 +108,23 @@ julia --project=. scripts/generate_spectra.jl   # writes data/theory_spectra_{op
 julia --project=. scripts/make_paper_plot.jl     # writes theory_spectra_paper.pdf
 ```
 
-## Notes
+## Performance
 
 - A `Cosmology` precomputes the linear growth solution, a χ↔z lookup spline
   and a 2-D `P(k, z)` spline, so construction is the main up-front cost; reuse
   the same object across calls.
+- `Cℓττ` caches the bubble-averaged variance `⟨σ²_R⟩(z)` once per redshift (it
+  is `k`-independent) rather than recomputing it for every multipole — the
+  dominant cost. The `σ²b` keyword on `Pee`/`Pee1h`/`P̃δδ` exposes the same
+  trick for custom loops.
+- Further opt-in speedup: since `P(k, z) = D(z)² f(k)`, every variance integral
+  scales as `D(z)²`, so `⟨σ²_R⟩(z) = (D(z)/D(z₀))² ⟨σ²_R⟩(z₀)`. You can compute
+  the integral once and rescale across redshift via `growth_factor`.
+- The `j`-loops in `Cℓττ`/`Cℓτϕ` are independent across redshift columns and
+  parallelise cleanly with `Threads.@threads` (start Julia with `-t auto`).
+
+## Notes
+
 - The original notebook (`cmb_tau_lensing_theory_spectra.ipynb`) is kept in the
   repository as a reference; the theory line for `Cℓτϕ` was derived by hand and
   may contain errors (see the notebook's own caveat).

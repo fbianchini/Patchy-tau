@@ -94,7 +94,10 @@ function Cℓττ(c::Cosmology; ℓs=nothing, zmin=1e-4, zmax=20, kmin=1e-4, kma
 
     Mᵢⱼ = zeros(length(ℓrange), length(χs))   # Pee(ℓᵢ/χⱼ; χⱼ)
     for j in eachindex(zs)
-        Mᵢⱼ[:, j] = [Pee(c, K[i, j], zs[j]; R̄=R̄, σlnR=σlnR, zre=zre, Δz=Δz, b=b)
+        # ⟨σ²_R⟩ is k-independent, so compute it once per redshift column
+        # instead of once per (ℓ, z) pair (it dominates the cost).
+        σ²b = sigma2_bubble(c, zs[j]; R̄=R̄, σlnR=σlnR)
+        Mᵢⱼ[:, j] = [Pee(c, K[i, j], zs[j]; R̄=R̄, σlnR=σlnR, zre=zre, Δz=Δz, b=b, σ²b=σ²b)
                      for i in eachindex(ℓrange)]
     end
 

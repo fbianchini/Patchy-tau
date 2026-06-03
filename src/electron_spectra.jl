@@ -7,13 +7,18 @@
 # All spectra are in Mpc³ and take `k` in Mpc⁻¹.
 
 """
-    P̃δδ(c, k, z; R̄=5, σlnR=log(2))
+    P̃δδ(c, k, z; R̄=5, σlnR=log(2), σ²b=nothing)
 
 Interpolating term between the small- and large-scale limits of the 1-halo
 electron spectrum (Wang & Hu 2006, Eq. 17).
+
+`σ²b` is the bubble-averaged density variance ⟨σ²_R⟩(z); it is `k`-independent,
+so when looping over many `k` at fixed `z` it can be precomputed once with
+[`sigma2_bubble`](@ref) and passed in to avoid recomputation. If `nothing`
+(default) it is computed internally.
 """
-function P̃δδ(c::Cosmology, k::Real, z::Real; R̄=5, σlnR=log(2))
-    σ²b = sigma2_bubble(c, z; R̄=R̄, σlnR=σlnR)
+function P̃δδ(c::Cosmology, k::Real, z::Real; R̄=5, σlnR=log(2), σ²b=nothing)
+    σ²b === nothing && (σ²b = sigma2_bubble(c, z; R̄=R̄, σlnR=σlnR))
     pkz = matter_power(c, k, z)
     vb = mean_bubble_volume(R̄, σlnR)
     num = pkz * σ²b * vb
@@ -22,15 +27,15 @@ function P̃δδ(c::Cosmology, k::Real, z::Real; R̄=5, σlnR=log(2))
 end
 
 """
-    Pee1h(c, k, z; R̄=5, σlnR=log(2), zre=7.0, Δz=1.0)
+    Pee1h(c, k, z; R̄=5, σlnR=log(2), zre=7.0, Δz=1.0, σ²b=nothing)
 
 One-halo (shot-noise + Poisson) contribution to the electron power spectrum
-(Wang & Hu 2006, Eq. 17).
+(Wang & Hu 2006, Eq. 17). See [`P̃δδ`](@ref) for the precomputed `σ²b` argument.
 """
-function Pee1h(c::Cosmology, k::Real, z::Real; R̄=5, σlnR=log(2), zre=7.0, Δz=1.0)
+function Pee1h(c::Cosmology, k::Real, z::Real; R̄=5, σlnR=log(2), zre=7.0, Δz=1.0, σ²b=nothing)
     xe = ionized_fraction(z; zre=zre, Δz=Δz)
     xe * (1 - xe) * (filter_W2_quad(k; R̄=R̄, σlnR=σlnR) * mean_bubble_volume(R̄, σlnR) +
-                     P̃δδ(c, k, z; R̄=R̄, σlnR=σlnR))
+                     P̃δδ(c, k, z; R̄=R̄, σlnR=σlnR, σ²b=σ²b))
 end
 
 """
@@ -47,12 +52,13 @@ function Pee2h(c::Cosmology, k::Real, z::Real; R̄=5, σlnR=log(2), zre=7.0, Δz
 end
 
 """
-    Pee(c, k, z; R̄=5, σlnR=log(2), zre=7.0, Δz=1.0, b=6.0)
+    Pee(c, k, z; R̄=5, σlnR=log(2), zre=7.0, Δz=1.0, b=6.0, σ²b=nothing)
 
-Total electron-electron power spectrum, `Pee1h + Pee2h`.
+Total electron-electron power spectrum, `Pee1h + Pee2h`. See [`P̃δδ`](@ref) for
+the precomputed `σ²b` argument.
 """
-function Pee(c::Cosmology, k::Real, z::Real; R̄=5, σlnR=log(2), zre=7.0, Δz=1.0, b=6.0)
-    Pee1h(c, k, z; R̄=R̄, σlnR=σlnR, zre=zre, Δz=Δz) +
+function Pee(c::Cosmology, k::Real, z::Real; R̄=5, σlnR=log(2), zre=7.0, Δz=1.0, b=6.0, σ²b=nothing)
+    Pee1h(c, k, z; R̄=R̄, σlnR=σlnR, zre=zre, Δz=Δz, σ²b=σ²b) +
     Pee2h(c, k, z; R̄=R̄, σlnR=σlnR, zre=zre, Δz=Δz, b=b)
 end
 
